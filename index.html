@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow — To-Do App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- Background blobs -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <div class="app-wrapper">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">TaskFlow</span>
+      </div>
+      <div class="header-stats">
+        <div class="stat-pill">
+          <span id="completedCount">0</span> done
+        </div>
+        <div class="stat-pill accent">
+          <span id="pendingCount">0</span> left
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1 class="hero-title">Your Tasks,<br/><em>Your Flow.</em></h1>
+      <p class="hero-sub">Capture, organize, and conquer your day.</p>
+    </section>
+
+    <!-- Add Task Form -->
+    <div class="add-task-card">
+      <div class="input-row">
+        <input
+          type="text"
+          id="taskInput"
+          class="task-input"
+          placeholder="What needs to be done?"
+          maxlength="120"
+          autocomplete="off"
+        />
+        <select id="categorySelect" class="cat-select">
+          <option value="work">💼 Work</option>
+          <option value="personal">🏠 Personal</option>
+          <option value="health">💪 Health</option>
+          <option value="learning">📚 Learning</option>
+          <option value="other">⚡ Other</option>
+        </select>
+        <select id="prioritySelect" class="pri-select">
+          <option value="medium">● Medium</option>
+          <option value="high">▲ High</option>
+          <option value="low">▼ Low</option>
+        </select>
+      </div>
+      <div class="input-row-2">
+        <input type="date" id="dueDateInput" class="date-input"/>
+        <button class="add-btn" id="addBtn" onclick="addTask()">
+          <span class="add-btn-icon">+</span>
+          <span>Add Task</span>
+        </button>
+      </div>
+      <div id="charCount" class="char-count">0 / 120</div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
+        <button class="filter-tab" data-filter="active" onclick="setFilter('active', this)">Active</button>
+        <button class="filter-tab" data-filter="completed" onclick="setFilter('completed', this)">Done</button>
+      </div>
+      <div class="filter-right">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search..." oninput="renderTasks()"/>
+        <button class="clear-btn" onclick="clearCompleted()">Clear Done</button>
+      </div>
+    </div>
+
+    <!-- Category Filter Pills -->
+    <div class="cat-filter-bar">
+      <button class="cat-pill active" data-cat="all" onclick="setCatFilter('all', this)">All</button>
+      <button class="cat-pill" data-cat="work" onclick="setCatFilter('work', this)">💼 Work</button>
+      <button class="cat-pill" data-cat="personal" onclick="setCatFilter('personal', this)">🏠 Personal</button>
+      <button class="cat-pill" data-cat="health" onclick="setCatFilter('health', this)">💪 Health</button>
+      <button class="cat-pill" data-cat="learning" onclick="setCatFilter('learning', this)">📚 Learning</button>
+      <button class="cat-pill" data-cat="other" onclick="setCatFilter('other', this)">⚡ Other</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-label">
+        <span>Progress</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- Task List -->
+    <div class="task-list" id="taskList">
+      <!-- Tasks rendered here -->
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">🎯</div>
+      <p class="empty-title">No tasks here!</p>
+      <p class="empty-sub">Add your first task above to get started.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>TaskFlow &copy; 2026</span>
+      <button class="danger-btn" onclick="clearAll()">🗑 Clear All</button>
+    </footer>
+
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Task</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <input type="text" id="editInput" class="modal-input" maxlength="120" placeholder="Task name..."/>
+      <div class="modal-row">
+        <select id="editCategory" class="modal-select">
+          <option value="work">💼 Work</option>
+          <option value="personal">🏠 Personal</option>
+          <option value="health">💪 Health</option>
+          <option value="learning">📚 Learning</option>
+          <option value="other">⚡ Other</option>
+        </select>
+        <select id="editPriority" class="modal-select">
+          <option value="medium">● Medium</option>
+          <option value="high">▲ High</option>
+          <option value="low">▼ Low</option>
+        </select>
+        <input type="date" id="editDueDate" class="modal-date"/>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-save" onclick="saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

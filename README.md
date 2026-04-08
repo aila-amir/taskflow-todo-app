@@ -20,9 +20,6 @@ A beautiful, fully-featured to-do list application built with vanilla HTML, CSS,
 - Vanilla JavaScript (no frameworks)
 - Browser localStorage for data persistence
 
-## 🚀 Live Demo
-[View Live App](https://aila-amir.github.io/taskflow-todo-app/)
-
 📸 How to Run Locally
 1. Clone this repository
 2. Open `index.html` in your browser
